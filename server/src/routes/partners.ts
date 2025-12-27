@@ -1,7 +1,24 @@
 import { Router, Request, Response } from 'express';
-import { body, validationResult, ValidationChain } from 'express-validator';
+import { body, validationResult } from 'express-validator';
 import { Partner } from '../models/Partner.js';
 import { authenticateToken, authorizeRoles } from '../middleware/auth.js';
+
+// Define custom request interface
+interface PartnerRequest extends Request {
+  user?: any;
+  params: {
+    [key: string]: string;
+  };
+  body: {
+    name?: string;
+    logo_url?: string;
+    website_url?: string;
+    description?: string;
+    isActive?: boolean;
+    sort_order?: number;
+    [key: string]: any;
+  };
+}
 
 const router = Router();
 
@@ -10,9 +27,9 @@ router.use(authenticateToken);
 router.use(authorizeRoles('admin'));
 
 // GET /api/partners - Get all partners for admin (including inactive)
-router.get('/', async (req, res) => {
+router.get('/', async (req: PartnerRequest, res: Response) => {
   try {
-    const partners = await Partner.findAll({
+    const partners = await (Partner as any).findAll({
       order: [['sort_order', 'ASC'], ['name', 'ASC']]
     });
 
@@ -30,14 +47,17 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/partners - Create new partner
-router.post('/',
+router.post(
+  '/',
   [
     body('name').trim().notEmpty().withMessage('Name is required'),
-    body('logo_url').trim().notEmpty().withMessage('Logo URL is required'),
-    body('website_url').optional().isURL().withMessage('Website URL must be a valid URL'),
-    body('sort_order').optional().isInt({ min: 0 }).withMessage('Sort order must be a non-negative integer')
+    body('description').optional().trim(),
+    body('website').optional().trim().isURL().withMessage('Invalid website URL'),
+    body('logo').optional().trim(),
+    body('is_active').optional().isBoolean().toBoolean(),
+    body('sort_order').optional().isInt({ min: 0 }).toInt(),
   ],
-  async (req: Request, res: Response) => {
+  async (req: PartnerRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -50,13 +70,13 @@ router.post('/',
 
       const { name, logo_url, website_url, description, isActive = true, sort_order = 0 } = req.body;
 
-      const partner = await Partner.create({
-        name,
-        logo_url,
-        website_url,
-        description,
-        isActive,
-        sort_order
+      const partner = await (Partner as any).create({
+        name: name || '',
+        logo_url: logo_url || '',
+        website_url: website_url || '',
+        description: description || '',
+        isActive: isActive !== undefined ? isActive : true,
+        sort_order: sort_order || 0
       });
 
       res.status(201).json({
@@ -82,7 +102,7 @@ router.put('/:id',
     body('website_url').optional().isURL().withMessage('Website URL must be a valid URL'),
     body('sort_order').optional().isInt({ min: 0 }).withMessage('Sort order must be a non-negative integer')
   ],
-  async (req: Request, res: Response) => {
+  async (req: PartnerRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -94,7 +114,7 @@ router.put('/:id',
       }
 
       const { id } = req.params;
-      const partner = await Partner.findByPk(id);
+      const partner = await (Partner as any).findByPk(id);
 
       if (!partner) {
         return res.status(404).json({
@@ -130,10 +150,10 @@ router.put('/:id',
 );
 
 // DELETE /api/partners/:id - Delete partner
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req: PartnerRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const partner = await Partner.findByPk(id);
+    const partner = await (Partner as any).findByPk(id);
 
     if (!partner) {
       return res.status(404).json({
@@ -158,9 +178,9 @@ router.delete('/:id', async (req, res) => {
 });
 
 // GET /api/partners/count - Get partner count for stats
-router.get('/count', async (req, res) => {
+router.get('/count', async (req: PartnerRequest, res: Response) => {
   try {
-    const count = await Partner.count({
+    const count = await (Partner as any).count({
       where: { isActive: true }
     });
 
