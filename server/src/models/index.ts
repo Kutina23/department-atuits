@@ -1,23 +1,49 @@
-import { User } from './User'
-import { Due } from './Due'
-import { StudentDue } from './StudentDue'
-import { Payment } from './Payment'
-import { Event } from './Event'
-import { Program } from './Program'
-import { Faculty } from './Faculty'
-import { Partner } from './Partner'
+import { Sequelize } from 'sequelize';
+import { User } from './User';
+import { Due } from './Due';
+import { StudentDue } from './StudentDue';
+import { Payment } from './Payment';
+import { Event } from './Event';
+import { Program } from './Program';
+import { Faculty } from './Faculty';
+import { Partner } from './Partner';
 
-// Define associations
-User.hasMany(StudentDue, { foreignKey: 'student_id', as: 'studentDues' })
-StudentDue.belongsTo(User, { foreignKey: 'student_id', as: 'student' })
+// Initialize Sequelize
+const sequelize = new Sequelize(
+  process.env.DB_NAME || 'department_db',
+  process.env.DB_USER || 'root',
+  process.env.DB_PASSWORD || '',
+  {
+    host: process.env.DB_HOST || 'localhost',
+    dialect: 'mysql',
+    logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    define: {
+      timestamps: true,
+      underscored: true,
+      freezeTableName: true,
+    },
+  }
+);
 
-Due.hasMany(StudentDue, { foreignKey: 'due_id', as: 'studentDues' })
-StudentDue.belongsTo(Due, { foreignKey: 'due_id', as: 'due' })
+// Export models
+const db = {
+  User,
+  Due,
+  StudentDue,
+  Payment,
+  Event,
+  Program,
+  Faculty,
+  Partner,
+  sequelize,
+  Sequelize,
+};
 
-User.hasMany(Payment, { foreignKey: 'student_id', as: 'payments' })
-Payment.belongsTo(User, { foreignKey: 'student_id', as: 'student' })
+// Set up associations
+Object.values(db).forEach(model => {
+  if ('associate' in model) {
+    model.associate(db);
+  }
+});
 
-Due.hasMany(Payment, { foreignKey: 'due_id', as: 'payments' })
-Payment.belongsTo(Due, { foreignKey: 'due_id', as: 'due' })
-
-export { User, Due, StudentDue, Payment, Event, Program, Faculty, Partner }
+export default db;
