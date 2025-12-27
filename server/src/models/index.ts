@@ -1,12 +1,12 @@
 import { Sequelize } from 'sequelize';
-import { User } from './User';
-import { Due } from './Due';
-import { StudentDue } from './StudentDue';
-import { Payment } from './Payment';
-import { Event } from './Event';
-import { Program } from './Program';
-import { Faculty } from './Faculty';
-import { Partner } from './Partner';
+import { User } from './User.js';
+import { Due } from './Due.js';
+import { StudentDue } from './StudentDue.js';
+import { Payment } from './Payment.js';
+import { Event } from './Event.js';
+import { Program } from './Program.js';
+import { Faculty } from './Faculty.js';
+import { Partner } from './Partner.js';
 
 // Initialize Sequelize
 const sequelize = new Sequelize(

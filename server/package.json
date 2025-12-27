@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
@@ -11,7 +12,6 @@
     "init-db": "node src/init-db.js",
     "fix-dues": "node src/fix-student-dues.js"
   },
-  "type": "commonjs",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -33,7 +33,6 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/express-validator": "^2.20.33",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^20.19.27",

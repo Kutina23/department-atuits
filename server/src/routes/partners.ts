@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
-import { Partner } from '../models/Partner';
-import { authenticateToken, authorizeRoles } from '../middleware/auth';
+import { body, validationResult, ValidationChain } from 'express-validator';
+import { Partner } from '../models/Partner.js';
+import { authenticateToken, authorizeRoles } from '../middleware/auth.js';
 
 const router = Router();
 

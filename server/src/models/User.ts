@@ -1,5 +1,5 @@
 import { DataTypes, Model, ModelStatic, Optional, Sequelize } from 'sequelize';
-import { UserAttributes, UserCreationAttributes } from '../types/models';
+import { UserAttributes, UserCreationAttributes } from '../types/models.js';
 
 // Define the User model class
 export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
