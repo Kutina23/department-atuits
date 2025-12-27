@@ -12,6 +12,8 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^25.0.3",
-    "@types/sequelize": "^4.28.20"
+    "@types/pg": "^8.16.0",
+    "@types/sequelize": "^4.28.20",
+    "@types/supertest": "^6.0.3"
   }
 }

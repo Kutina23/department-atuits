@@ -1,28 +1,42 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Partner = exports.Faculty = exports.Program = exports.Event = exports.Payment = exports.StudentDue = exports.Due = exports.User = void 0;
+const sequelize_1 = require("sequelize");
 const User_1 = require("./User");
-Object.defineProperty(exports, "User", { enumerable: true, get: function () { return User_1.User; } });
 const Due_1 = require("./Due");
-Object.defineProperty(exports, "Due", { enumerable: true, get: function () { return Due_1.Due; } });
 const StudentDue_1 = require("./StudentDue");
-Object.defineProperty(exports, "StudentDue", { enumerable: true, get: function () { return StudentDue_1.StudentDue; } });
 const Payment_1 = require("./Payment");
-Object.defineProperty(exports, "Payment", { enumerable: true, get: function () { return Payment_1.Payment; } });
 const Event_1 = require("./Event");
-Object.defineProperty(exports, "Event", { enumerable: true, get: function () { return Event_1.Event; } });
 const Program_1 = require("./Program");
-Object.defineProperty(exports, "Program", { enumerable: true, get: function () { return Program_1.Program; } });
 const Faculty_1 = require("./Faculty");
-Object.defineProperty(exports, "Faculty", { enumerable: true, get: function () { return Faculty_1.Faculty; } });
 const Partner_1 = require("./Partner");
-Object.defineProperty(exports, "Partner", { enumerable: true, get: function () { return Partner_1.Partner; } });
-// Define associations
-User_1.User.hasMany(StudentDue_1.StudentDue, { foreignKey: 'student_id', as: 'studentDues' });
-StudentDue_1.StudentDue.belongsTo(User_1.User, { foreignKey: 'student_id', as: 'student' });
-Due_1.Due.hasMany(StudentDue_1.StudentDue, { foreignKey: 'due_id', as: 'studentDues' });
-StudentDue_1.StudentDue.belongsTo(Due_1.Due, { foreignKey: 'due_id', as: 'due' });
-User_1.User.hasMany(Payment_1.Payment, { foreignKey: 'student_id', as: 'payments' });
-Payment_1.Payment.belongsTo(User_1.User, { foreignKey: 'student_id', as: 'student' });
-Due_1.Due.hasMany(Payment_1.Payment, { foreignKey: 'due_id', as: 'payments' });
-Payment_1.Payment.belongsTo(Due_1.Due, { foreignKey: 'due_id', as: 'due' });
+// Initialize Sequelize
+const sequelize = new sequelize_1.Sequelize(process.env.DB_NAME || 'department_db', process.env.DB_USER || 'root', process.env.DB_PASSWORD || '', {
+    host: process.env.DB_HOST || 'localhost',
+    dialect: 'mysql',
+    logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    define: {
+        timestamps: true,
+        underscored: true,
+        freezeTableName: true,
+    },
+});
+// Export models
+const db = {
+    User: User_1.User,
+    Due: Due_1.Due,
+    StudentDue: StudentDue_1.StudentDue,
+    Payment: Payment_1.Payment,
+    Event: Event_1.Event,
+    Program: Program_1.Program,
+    Faculty: Faculty_1.Faculty,
+    Partner: Partner_1.Partner,
+    sequelize,
+    Sequelize: sequelize_1.Sequelize,
+};
+// Set up associations
+Object.values(db).forEach(model => {
+    if ('associate' in model) {
+        model.associate(db);
+    }
+});
+exports.default = db;
